@@ -5,7 +5,7 @@ import { ElNotification } from 'element-plus'
 import NavBar from "@/components/NavBar.vue";
 import ContentField from "@/components/ContentField.vue";
 
-const port = 'http://localhost:8080/api';
+const port = 'http://localhost:3000';
 const token = sessionStorage.getItem("token");
 let dialogVisible = ref(false);
 let users = ref([]);

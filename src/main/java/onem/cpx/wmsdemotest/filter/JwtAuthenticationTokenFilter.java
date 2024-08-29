@@ -49,7 +49,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
             System.out.print("userName:");
             System.out.println(userName);
-            filterChain.doFilter(request, response);
+            //filterChain.doFilter(request, response);
         } catch (Exception e) {
             System.out.println(e);
             throw new RuntimeException("token校验失败");

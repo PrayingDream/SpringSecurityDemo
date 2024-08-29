@@ -109,7 +109,7 @@ let confirm_validate = (rule, value, callback) => {
   if (value !== add_form.password) {
     console.log(value,add_form.password);
     callback(new Error('两次输入密码不一致!'))
-  } else {
+  } else {/**/
     callback()
   }
 }
