@@ -1,6 +1,8 @@
 package onem.cpx.wmsdemotest.filter;
 
+import com.alibaba.fastjson2.JSON;
 import io.jsonwebtoken.Claims;
+import onem.cpx.wmsdemotest.result.ResultData;
 import onem.cpx.wmsdemotest.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,9 +25,6 @@ import java.util.List;
 
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
-
-    @Resource
-    private AuthenticationManager authenticationManager;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -52,7 +51,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             //filterChain.doFilter(request, response);
         } catch (Exception e) {
             System.out.println(e);
-            throw new RuntimeException("token校验失败");
+            response.getWriter().print(JSON.toJSONString(ResultData.Err(400,"token失效")));
+            return;
         }
 
         // 设置通用权限

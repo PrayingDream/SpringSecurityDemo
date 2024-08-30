@@ -4,9 +4,15 @@ import {reactive,ref,onMounted} from "vue";
 import { ElNotification } from 'element-plus'
 import NavBar from "@/components/NavBar.vue";
 import ContentField from "@/components/ContentField.vue";
+import router from "@/router";
 
 const port = 'http://localhost:3000';
 const token = sessionStorage.getItem("token");
+const headers = {
+  'Content-Type': 'application/json',
+  'x-requested-with': 'XMLHttpRequest',
+  'token': token,
+};
 let dialogVisible = ref(false);
 let users = ref([]);
 const updateFormRef = ref();
@@ -89,11 +95,7 @@ let updateForm = reactive({
 
 onMounted(() => {
   axios.get(port + '/userinfo/selectAll',{
-    headers: {
-      'Content-Type': 'application/json',
-      'x-requested-with': 'XMLHttpRequest',
-      'token': token,
-    }
+    headers: headers
   }).then((function (resp) {
     if (resp.data.code === 200) {
       users.value = resp.data.data;
@@ -104,6 +106,8 @@ onMounted(() => {
         type: 'success',
         duration: 2000
       });
+    } else if (resp.data.code === 400) {
+      router.push({path: '/login'});
     } else {
       ElNotification({
         title: '获取失败，暂无数据',
@@ -118,9 +122,13 @@ onMounted(() => {
 
 function deleteUser(id)
 {
-  axios.post(port + '/userinfo/delete?id=' + id).then(function (response) {
+  axios.post(port + '/userinfo/delete?id=' + id,null,{
+    headers: headers
+  }).then(function (response) {
     if (response.data.code === 200) {
-      axios.get(port + '/userinfo/selectAll').then(function (response) {
+      axios.get(port + '/userinfo/selectAll',{
+        headers: headers
+      }).then(function (response) {
         users.value = response.data.data;
         ElNotification({
           title: '删除成功',
@@ -129,6 +137,8 @@ function deleteUser(id)
           duration: 2000
         })
       })
+    } else if (response.data.code === 400) {
+      router.push({path: '/login'});
     } else {
       ElNotification({
         title: '删除失败',
@@ -144,10 +154,14 @@ function updateUser()
 {
   updateFormRef.value.validate((valid) => {
     if (valid) {
-      axios.post(port + '/user/update', updateForm).then(function (response) {
+      axios.post(port + '/userinfo/update', updateForm,{
+        headers: headers
+      }).then(function (response) {
         console.log(response);
         if (response.data.code === 200) {
-          axios.get(port + '/user/selectAll').then(function (response) {
+          axios.get(port + '/userinfo/selectAll',{
+            headers: headers
+          }).then(function (response) {
             users.value = response.data.data;
             ElNotification({
               title: '编辑成功',
@@ -156,6 +170,8 @@ function updateUser()
               duration: 2000
             });
           })
+        } else if (response.data.code === 400) {
+          router.push({path: '/login'});
         } else {
           ElNotification({
             title: '编辑失败',

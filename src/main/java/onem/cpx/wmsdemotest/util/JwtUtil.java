@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class JwtUtil {
     /**过期时间---1 hour*/
-    private static final int EXPIRATION_TIME = 60*60;
+    private static final int EXPIRATION_TIME = 60 * 60;
     /**自己设定的秘钥*/
     private static final String SECRET = "023bdc63c3c5a4587a*9ee65815f08b9d03ad39a74fc0c9a9cce60faf161ffg5ht";
     /**前缀*/

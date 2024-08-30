@@ -4,9 +4,16 @@ import {ref, reactive} from "vue";
 import {ElNotification} from "element-plus";
 import NavBar from "@/components/NavBar.vue";
 import ContentField from "@/components/ContentField.vue";
+import router from "@/router";
 
 const port = 'localhost';
 let dialogVisible = ref(false);
+const token = sessionStorage.getItem("token");
+const headers = {
+  'Content-Type': 'application/json',
+  'x-requested-with': 'XMLHttpRequest',
+  'token': token,
+};
 let selectForm = reactive({
   jobNumber: null,
   name: null,
@@ -110,8 +117,6 @@ let dialogRules = {
   ]
 }
 
-const token = ref(sessionStorage.getItem('token'));
-
 function switchInput() {
   state.jobNumber = !state.jobNumber;
   state.name = !state.name;
@@ -122,12 +127,8 @@ function resetForm() {
 }
 
 function onSubmit() {
-  axios.post('http://' + port + ':3000/user/select', selectForm,{
-    headers: {
-      'Content-Type': 'application/json',
-      'x-requested-with': 'XMLHttpRequest',
-      'token': token.value,
-    }
+  axios.post('http://' + port + ':3000/userinfo/select', selectForm,{
+    headers: headers
   }).then(function (response) {
     getForm.value = reactive(response.data.data);
     if (response.data.code === 200) {
@@ -138,6 +139,8 @@ function onSubmit() {
         duration: 2000
       });
       console.log(token.value)
+    } else if (response.data.code === 400) {
+      router.push({path: '/login'});
     } else {
       ElNotification({
         title: '查询失败',
@@ -151,9 +154,13 @@ function onSubmit() {
 
 function deleteUser(id) {
   if (id !== 0) {
-    axios.post('http://' + port + ':3000/user/delete?id=' + id).then(function (response) {
+    axios.post('http://' + port + ':3000/userinfo/delete?id=' + id,null,{
+      headers: headers
+    }).then(function (response) {
       if (response.data.code === 200) {
-        axios.post('http://' + port + ':3000/user/select', selectForm).then(function (response) {
+        axios.post('http://' + port + ':3000/userinfo/select', selectForm,{
+          headers: headers
+        }).then(function (response) {
           getForm.value = reactive(response.data.data);
           ElNotification({
             title: '删除成功',
@@ -162,6 +169,8 @@ function deleteUser(id) {
             duration: 2000
           });
         })
+      } else if (response.data.code === 400) {
+        router.push({path: '/login'});
       } else {
         ElNotification({
           title: '删除失败',
@@ -184,10 +193,14 @@ function deleteUser(id) {
 function updateUser() {
   updateFormRef.value.validate(valid => {
     if (valid) {
-      axios.post('http://' + port + ':3000/user/update', updateForm).then(function (response) {
+      axios.post('http://' + port + ':3000/userinfo/update', updateForm,{
+        headers: headers
+      }).then(function (response) {
         console.log(response);
         if (response.data.code === 200) {
-          axios.post('http://' + port + ':3000/user/select', selectForm).then(function (response) {
+          axios.post('http://' + port + ':3000/userinfo/select', selectForm,{
+            headers: headers
+          }).then(function (response) {
             getForm.value = reactive(response.data.data);
             ElNotification({
               title: '编辑成功',
@@ -196,6 +209,8 @@ function updateUser() {
               duration: 2000
             });
           })
+        } else if (response.data.code === 400) {
+          router.push({path: '/login'});
         } else {
           ElNotification({
             title: '编辑失败',

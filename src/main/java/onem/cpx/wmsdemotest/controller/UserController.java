@@ -21,7 +21,12 @@ public class UserController {
     @PostMapping("/login")
     public ResultResponse<Map<String,String>> login(@RequestBody User user){
         System.out.println("/login");
-        String token = userService.login(user);
+        String token;
+        try {
+            token = userService.login(user);
+        } catch (Exception e) {
+            return ResultData.Err(401,"账号或密码错误");
+        }
         System.out.println("token:");
         System.out.println(token);
         if (StringUtils.hasLength(token)) {
@@ -37,7 +42,6 @@ public class UserController {
     @PostMapping("/add")
     public void add(@RequestBody User user){
         System.out.println(user);
-
     }
 
 }

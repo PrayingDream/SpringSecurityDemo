@@ -81,8 +81,9 @@
 import {reactive, ref} from "vue";
 import axios from "axios";
 import {useRouter} from "vue-router";
+import {ElNotification} from "element-plus";
 
-const port = "http://localhost:8080/api";
+const port = 'http://localhost:3000';
 let isLogin = ref(true);
 // 登录表单
 let login_form = reactive(
@@ -177,7 +178,12 @@ function Login(){
           console.log(token.value)
           router.push({path:"/all"});
         } else {
-          console.log("账号或密码不正确");
+          ElNotification({
+            title: '账号或密码错误',
+            message: response.data.message,
+            type: 'error',
+            duration: 2000
+          })
         }
       })
     }

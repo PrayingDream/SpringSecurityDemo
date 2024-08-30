@@ -4,8 +4,15 @@ import {reactive,ref} from "vue";
 import {ElNotification} from 'element-plus'
 import NavBar from "@/components/NavBar.vue";
 import ContentField from "@/components/ContentField.vue";
+import router from "@/router";
 
 const port = 'localhost';
+const token = sessionStorage.getItem("token");
+const headers = {
+  'Content-Type': 'application/json',
+  'x-requested-with': 'XMLHttpRequest',
+  'token': token,
+};
 let form = reactive({
   id: 0,
   jobNumber: '',
@@ -89,7 +96,9 @@ function onSubmit() {
   formRef.value.validate(valid => {
     if (valid) {
       this.salary = +this.salary;
-      axios.post('http://' + port + ':3000/user/insert', form).then(function (response) {
+      axios.post('http://' + port + ':3000/userinfo/insert', form,{
+        headers: headers
+      }).then(function (response) {
         if (response.data.code === 200) {
           ElNotification({
             title: '添加成功',
@@ -98,6 +107,8 @@ function onSubmit() {
             duration: 2000
           })
           formRef.value.resetFields();
+        } else if (response.data.code === 400) {
+          router.push({path: '/login'});
         } else {
           ElNotification({
             title: '添加失败',
